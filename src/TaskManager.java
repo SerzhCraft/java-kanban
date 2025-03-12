@@ -7,6 +7,13 @@ public class TaskManager {
     private HashMap<Integer, Subtask> subtasks = new HashMap<>();
     private int idNumber = 1;
 
+    private int generateId() {
+        if (idNumber == Integer.MAX_VALUE) {
+            idNumber = 1;
+        }
+        return idNumber++;
+    }
+
     // Методы для класса Task
     public ArrayList<Task> getAllTasks() {
         return new ArrayList<>(tasks.values());
@@ -21,7 +28,7 @@ public class TaskManager {
     }
 
     public Task createTask(Task task) {
-        task.setId(idNumber++);
+        task.setId(generateId());
         tasks.put(task.getId(), task);
         return task;
     }
@@ -51,9 +58,8 @@ public class TaskManager {
     }
 
     public Epic createEpic(Epic epic) {
-        epic.setId(idNumber++);
+        epic.setId(generateId());
         epics.put(epic.getId(), epic);
-        updateEpicStatus(epic);
         return epic;
     }
 
@@ -91,7 +97,7 @@ public class TaskManager {
     }
 
     public Subtask createSubtask(Subtask subtask) {
-        subtask.setId(idNumber++);
+        subtask.setId(generateId());
         subtasks.put(subtask.getId(), subtask);
         Epic epic = subtask.getEpic();
         epic.addSubtask(subtask);
@@ -116,31 +122,18 @@ public class TaskManager {
         }
     }
 
+    // Метод получения списка всех подзадач определённого эпика
+    public ArrayList<Subtask> getSubtaskByEpicId(int epicId) {
+        Epic epic = epics.get(epicId);
+        if (epic != null) {
+            return new ArrayList<>(epic.getSubtasks());
+        }
+        return new ArrayList<>();
+    }
+
     // Метод обновления статуса класса Epic
     private void updateEpicStatus(Epic epic) {
-        if (epic.getSubtasks().isEmpty()) {
-            epic.setTaskStatus(TaskStatus.NEW);
-            return;
-        }
-
-        boolean isAllDone = true;
-        boolean isAllNew = true;
-        for (Subtask subtask : epic.getSubtasks()) {
-            if (subtask.getTaskStatus() != TaskStatus.DONE) {
-                isAllDone = false;
-            }
-            if (subtask.getTaskStatus() != TaskStatus.NEW) {
-                isAllNew = false;
-            }
-        }
-        if (isAllNew) {
-            epic.setTaskStatus(TaskStatus.NEW);
-        } else if (isAllDone) {
-            epic.setTaskStatus(TaskStatus.DONE);
-        } else {
-            epic.setTaskStatus(TaskStatus.IN_PROGRESS);
-        }
-
+        epic.updateStatus();
     }
 
 }
