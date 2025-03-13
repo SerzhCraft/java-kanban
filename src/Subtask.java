@@ -4,7 +4,6 @@ public class Subtask extends Task{
     public Subtask(String name, String description, Epic epic) {
         super(name, description);
         this.epic = epic;
-        this.setTaskStatus(TaskStatus.NEW);
     }
 
     public Epic getEpic() {
