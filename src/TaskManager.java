@@ -1,139 +1,49 @@
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
 
-public class TaskManager {
-    private HashMap<Integer, Task> tasks = new HashMap<>();
-    private HashMap<Integer, Epic> epics = new HashMap<>();
-    private HashMap<Integer, Subtask> subtasks = new HashMap<>();
-    private int idNumber = 1;
-
-    private int generateId() {
-        if (idNumber == Integer.MAX_VALUE) {
-            idNumber = 1;
-        }
-        return idNumber++;
-    }
-
+public interface TaskManager <T extends Task>{
     // Методы для класса Task
-    public ArrayList<Task> getAllTasks() {
-        return new ArrayList<>(tasks.values());
-    }
+    ArrayList<T> getAllTasks();
 
-    public void deleteAllTasks() {
-        tasks.clear();
-    }
+    void deleteAllTasks();
 
-    public Task getTaskById(int id) {
-        return tasks.get(id);
-    }
+    T getTaskById(int id);
 
-    public Task createTask(Task task) {
-        task.setId(generateId());
-        tasks.put(task.getId(), task);
-        return task;
-    }
+    T createTask(T task);
 
-    public void updateTask(Task task) {
-        if (tasks.containsKey(task.getId())) {
-            tasks.put(task.getId(), task);
-        }
-    }
+    void updateTask(T task);
 
-    public void deleteTaskById(int id) {
-        tasks.remove(id);
-    }
+    void deleteTaskById(int id);
 
     // Методы для класса Epics
-    public ArrayList<Epic> getAllEpics() {
-        return new ArrayList<>(epics.values());
-    }
+    ArrayList<Epic> getAllEpics();
 
-    public void deleteAllEpics() {
-        epics.clear();
-        subtasks.clear();
-    }
+    void deleteAllEpics();
 
-    public Epic getEpicById(int id) {
-        return epics.get(id);
-    }
+    Epic getEpicById(int id);
 
-    public Epic createEpic(Epic epic) {
-        epic.setId(generateId());
-        epics.put(epic.getId(), epic);
-        return epic;
-    }
+    Epic createEpic(Epic epic);
 
-    public void updateEpic(Epic epic) {
-        if (epics.containsKey(epic.getId())) {
-            epics.put(epic.getId(), epic);
-            updateEpicStatus(epic);
-        }
-    }
+    void updateEpic(Epic epic);
 
-    public void deleteEpicById(int id) {
-        Epic epic = epics.remove(id);
-        if (epic != null) {
-            for (Subtask subtask : epic.getSubtasks()) {
-                subtasks.remove(subtask.getId());
-            }
-        }
-    }
+    void deleteEpicById(int id);
 
     // Методы для класса Subtask
-    public ArrayList<Subtask> getAllSubtasks() {
-        return new ArrayList<>(subtasks.values());
-    }
+    ArrayList<Subtask> getAllSubtasks();
 
-    public void deleteAllSubtasks() {
-        subtasks.clear();
-        for (Epic epic : epics.values()) {
-            epic.getSubtasks().clear();
-            updateEpicStatus(epic);
-        }
-    }
+    void deleteAllSubtasks();
 
-    public Subtask getSubtaskById(int id) {
-        return subtasks.get(id);
-    }
+    Subtask getSubtaskById(int id);
 
-    public Subtask createSubtask(Subtask subtask) {
-        subtask.setId(generateId());
-        subtasks.put(subtask.getId(), subtask);
-        Epic epic = subtask.getEpic();
-        epic.addSubtask(subtask);
-        updateEpicStatus(epic);
-        return subtask;
-    }
+    Subtask createSubtask(Subtask subtask);
 
-    public void updateSubtask(Subtask subtask) {
-        if (subtasks.containsKey(subtask.getId())) {
-            subtasks.put(subtask.getId(), subtask);
-            Epic epic = subtask.getEpic();
-            updateEpicStatus(epic);
-        }
-    }
+    void updateSubtask(Subtask subtask);
 
-    public void deleteSubtaskById(int id) {
-        Subtask subtask = subtasks.remove(id);
-        if (subtask != null) {
-            Epic epic = subtask.getEpic();
-            epic.removeSubtask(subtask);
-            updateEpicStatus(epic);
-        }
-    }
+    void deleteSubtaskById(int id);
 
     // Метод получения списка всех подзадач определённого эпика
-    public ArrayList<Subtask> getSubtaskByEpicId(int epicId) {
-        Epic epic = epics.get(epicId);
-        if (epic != null) {
-            return new ArrayList<>(epic.getSubtasks());
-        }
-        return new ArrayList<>();
-    }
+    ArrayList<Subtask> getSubtaskByEpicId(int epicId);
 
-    // Метод обновления статуса класса Epic
-    private void updateEpicStatus(Epic epic) {
-        epic.updateStatus();
-    }
-
+    //Метод для получения истории просмотров
+    List<T> getHistory();
 }
