@@ -1,16 +1,22 @@
+package main.java.managers;
+
+import main.java.models.Epic;
+import main.java.models.Subtask;
+import main.java.models.Task;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class InMemoryTaskManager<T extends Task> implements TaskManager<T> {
-    public static final int MAX_HISTORY_SIZE = 10;
 
     private final Map<Integer, T> tasks = new HashMap<>();
     private final Map<Integer, Epic> epics = new HashMap<>();
     private final Map<Integer, Subtask> subtasks = new HashMap<>();
     private int idNumber = 1;
-    private final List<T> history = new ArrayList<>(MAX_HISTORY_SIZE);
+    private final HistoryManager historyManager = new InMemoryHistoryManager();
+
 
     private int generateId() {
         if (idNumber == Integer.MAX_VALUE) {
@@ -19,21 +25,12 @@ public class InMemoryTaskManager<T extends Task> implements TaskManager<T> {
         return idNumber++;
     }
 
-    private void addToHistory(T task) {
-        if (task == null) return;
-
-        if (history.size() >= MAX_HISTORY_SIZE) {
-            history.removeFirst();
-        }
-        history.addLast(task);
-    }
-
     @Override
     public List<T> getHistory() {
-        return new ArrayList<>(history);
+        return historyManager.getHistory();
     }
 
-    // Методы для класса Task
+    // Методы для класса main.java.models.Task
     @Override
     public ArrayList<T> getAllTasks() {
         return new ArrayList<>(tasks.values());
@@ -48,7 +45,7 @@ public class InMemoryTaskManager<T extends Task> implements TaskManager<T> {
     public T getTaskById(int id) {
         T task = tasks.get(id);
         if (task != null) {
-            addToHistory(task);
+            historyManager.add(task);
         }
         return task;
     }
@@ -88,7 +85,7 @@ public class InMemoryTaskManager<T extends Task> implements TaskManager<T> {
     public Epic getEpicById(int id) {
         Epic epic = epics.get(id);
         if (epic != null) {
-            addToHistory((T) epic);
+            historyManager.add(epic);
         }
         return epic;
     }
@@ -118,7 +115,7 @@ public class InMemoryTaskManager<T extends Task> implements TaskManager<T> {
         }
     }
 
-    // Методы для класса Subtask
+    // Методы для класса main.java.models.Subtask
     @Override
     public ArrayList<Subtask> getAllSubtasks() {
         return new ArrayList<>(subtasks.values());
@@ -137,7 +134,7 @@ public class InMemoryTaskManager<T extends Task> implements TaskManager<T> {
     public Subtask getSubtaskById(int id) {
         Subtask subtask = subtasks.get(id);
         if (subtask != null) {
-            addToHistory((T) subtask);
+            historyManager.add(subtask);
         }
         return subtask;
     }
@@ -181,7 +178,7 @@ public class InMemoryTaskManager<T extends Task> implements TaskManager<T> {
         return new ArrayList<>();
     }
 
-    // Метод обновления статуса класса Epic
+    // Метод обновления статуса класса main.java.models.Epic
     private void updateEpicStatus(Epic epic) {
         epic.updateStatus();
     }
