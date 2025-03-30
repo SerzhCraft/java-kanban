@@ -1,3 +1,5 @@
+package main.java;
+
 import main.java.enums.TaskStatus;
 import main.java.managers.Managers;
 import main.java.managers.TaskManager;
@@ -47,7 +49,9 @@ public class Main {
         printAllTasks(taskManager);
 
         task1.setTaskStatus(TaskStatus.IN_PROGRESS);
+        task1.setDescription("New description");
         taskManager.updateTask(task1);
+        taskManager.getTaskById(task1.getId());
 
         subtask1.setTaskStatus(TaskStatus.DONE);
         taskManager.updateSubtask(subtask1);
@@ -61,6 +65,8 @@ public class Main {
         taskManager.deleteEpicById(epic1.getId());
         taskManager.getSubtaskById(subtask3.getId());
         printAllTasks(taskManager);
+
+
 
     }
 

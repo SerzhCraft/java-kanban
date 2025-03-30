@@ -16,7 +16,9 @@ public class InMemoryHistoryManager<T extends Task> implements HistoryManager<T>
         if (history.size() >= MAX_HISTORY_SIZE) {
             history.removeFirst();
         }
-        history.addLast(task);
+
+        T taskCopy = (T) task.copy();
+        history.addLast(taskCopy);
     }
 
     @Override

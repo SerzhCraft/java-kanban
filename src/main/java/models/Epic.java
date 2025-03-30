@@ -17,6 +17,9 @@ public class Epic extends Task {
     }
 
     public void addSubtask(Subtask subtask) {
+        if (subtask == null || subtask.getEpic() == this) {
+            return;
+        }
         subtasks.add(subtask);
     }
 
@@ -53,6 +56,13 @@ public class Epic extends Task {
         }
     }
 
+    @Override
+    public Epic copy() {
+        Epic copy = new Epic(this.getName(), this.getDescription());
+        copy.setId(this.getId());
+        copy.setTaskStatus(this.getTaskStatus());
+        return copy;
+    }
 }
 
 
