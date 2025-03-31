@@ -11,7 +11,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        TaskManager<Task> taskManager = Managers.getDefault();
+        TaskManager taskManager = Managers.getDefault();
 
         Task task1 = new Task("Task 1", "Task 1's description");
         Task task2 = new Task("Task 2", "Task 2's description");
@@ -71,7 +71,7 @@ public class Main {
     }
 
 
-    private static void printAllTasks(TaskManager<Task> manager) {
+    private static void printAllTasks(TaskManager manager) {
         System.out.println("Tasks:");
         for (Task task : manager.getAllTasks()) {
             System.out.println(task);

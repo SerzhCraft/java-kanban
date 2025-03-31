@@ -9,9 +9,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class InMemoryTaskManager<T extends Task> implements TaskManager<T> {
+public class InMemoryTaskManager implements TaskManager {
 
-    private final Map<Integer, T> tasks = new HashMap<>();
+    private final Map<Integer, Task> tasks = new HashMap<>();
     private final Map<Integer, Epic> epics = new HashMap<>();
     private final Map<Integer, Subtask> subtasks = new HashMap<>();
     private int idNumber = 1;
@@ -26,13 +26,13 @@ public class InMemoryTaskManager<T extends Task> implements TaskManager<T> {
     }
 
     @Override
-    public List<T> getHistory() {
+    public List<Task> getHistory() {
         return historyManager.getHistory();
     }
 
     // Методы для класса main.java.models.Task
     @Override
-    public ArrayList<T> getAllTasks() {
+    public List<Task> getAllTasks() {
         return new ArrayList<>(tasks.values());
     }
 
@@ -42,8 +42,8 @@ public class InMemoryTaskManager<T extends Task> implements TaskManager<T> {
     }
 
     @Override
-    public T getTaskById(int id) {
-        T task = tasks.get(id);
+    public Task getTaskById(int id) {
+        Task task = tasks.get(id);
         if (task != null) {
             historyManager.add(task);
         }
@@ -51,14 +51,14 @@ public class InMemoryTaskManager<T extends Task> implements TaskManager<T> {
     }
 
     @Override
-    public T createTask(T task) {
+    public Task createTask(Task task) {
         task.setId(generateId());
         tasks.put(task.getId(), task);
         return task;
     }
 
     @Override
-    public void updateTask(T task) {
+    public void updateTask(Task task) {
         if (tasks.containsKey(task.getId())) {
             tasks.put(task.getId(), task);
         }
@@ -71,7 +71,7 @@ public class InMemoryTaskManager<T extends Task> implements TaskManager<T> {
 
     // Методы для класса Epics
     @Override
-    public ArrayList<Epic> getAllEpics() {
+    public List<Epic> getAllEpics() {
         return new ArrayList<>(epics.values());
     }
 
@@ -117,7 +117,7 @@ public class InMemoryTaskManager<T extends Task> implements TaskManager<T> {
 
     // Методы для класса main.java.models.Subtask
     @Override
-    public ArrayList<Subtask> getAllSubtasks() {
+    public List<Subtask> getAllSubtasks() {
         return new ArrayList<>(subtasks.values());
     }
 
@@ -170,7 +170,7 @@ public class InMemoryTaskManager<T extends Task> implements TaskManager<T> {
 
     // Метод получения списка всех подзадач определённого эпика
     @Override
-    public ArrayList<Subtask> getSubtaskByEpicId(int epicId) {
+    public List<Subtask> getSubtaskByEpicId(int epicId) {
         Epic epic = epics.get(epicId);
         if (epic != null) {
             return new ArrayList<>(epic.getSubtasks());

@@ -5,24 +5,24 @@ import main.java.models.Task;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InMemoryHistoryManager<T extends Task> implements HistoryManager<T> {
+public class InMemoryHistoryManager implements HistoryManager<Task> {
     public static final int MAX_HISTORY_SIZE = 10;
-    private final List<T> history = new ArrayList<>(MAX_HISTORY_SIZE);
+    private final List<Task> history = new ArrayList<>(MAX_HISTORY_SIZE);
 
     @Override
-    public void add(T task) {
+    public void add(Task task) {
         if (task == null) return;
 
         if (history.size() >= MAX_HISTORY_SIZE) {
             history.removeFirst();
         }
 
-        T taskCopy = (T) task.copy();
+        Task taskCopy = task.copy();
         history.addLast(taskCopy);
     }
 
     @Override
-    public List<T> getHistory() {
+    public List<Task> getHistory() {
         return new ArrayList<>(history);
     }
 

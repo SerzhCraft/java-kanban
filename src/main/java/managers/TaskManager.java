@@ -4,25 +4,24 @@ import main.java.models.Epic;
 import main.java.models.Subtask;
 import main.java.models.Task;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public interface TaskManager<T extends Task> {
+public interface TaskManager {
     // Методы для класса main.java.models.Task
-    ArrayList<T> getAllTasks();
+    List<Task> getAllTasks();
 
     void deleteAllTasks();
 
-    T getTaskById(int id);
+    Task getTaskById(int id);
 
-    T createTask(T task);
+    Task createTask(Task task);
 
-    void updateTask(T task);
+    void updateTask(Task task);
 
     void deleteTaskById(int id);
 
     // Методы для класса Epics
-    ArrayList<Epic> getAllEpics();
+    List<Epic> getAllEpics();
 
     void deleteAllEpics();
 
@@ -35,7 +34,7 @@ public interface TaskManager<T extends Task> {
     void deleteEpicById(int id);
 
     // Методы для класса main.java.models.Subtask
-    ArrayList<Subtask> getAllSubtasks();
+    List<Subtask> getAllSubtasks();
 
     void deleteAllSubtasks();
 
@@ -48,10 +47,10 @@ public interface TaskManager<T extends Task> {
     void deleteSubtaskById(int id);
 
     // Метод получения списка всех подзадач определённого эпика
-    ArrayList<Subtask> getSubtaskByEpicId(int epicId);
+    List<Subtask> getSubtaskByEpicId(int epicId);
 
     // Метод для получения истории
 
-    List<T> getHistory();
+    List<Task> getHistory();
 
 }
