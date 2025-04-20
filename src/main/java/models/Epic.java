@@ -17,10 +17,9 @@ public class Epic extends Task {
     }
 
     public void addSubtask(Subtask subtask) {
-        if (subtask == null || subtask.getEpic() == this) {
-            return;
+        if (subtask != null && subtask.getEpic() == this) {
+            subtasks.add(subtask);
         }
-        subtasks.add(subtask);
     }
 
     public void removeSubtask(Subtask subtask) {
@@ -35,6 +34,7 @@ public class Epic extends Task {
 
         boolean isAllDone = true;
         boolean isAllNew = true;
+
         for (Subtask subtask : subtasks) {
             if (subtask.getTaskStatus() == TaskStatus.IN_PROGRESS) {
                 setTaskStatus(TaskStatus.IN_PROGRESS);
