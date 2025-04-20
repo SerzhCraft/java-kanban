@@ -28,7 +28,8 @@ public class InMemoryHistoryManager implements HistoryManager<Task> {
 
         remove(task.getId());
 
-        Node newNode = new Node(task.copy());
+        Task taskCopy = task.copy();
+        Node newNode = new Node(taskCopy);
         linkLast(newNode);
         historyMap.put(task.getId(), newNode);
 
