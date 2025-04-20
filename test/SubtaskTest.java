@@ -9,21 +9,21 @@ public class SubtaskTest {
 
     @Test
     void shouldBeEqualsByIdSubtasksWithSameId() {
-        Epic epic = new Epic("Epic", "Epic's description");
-        Subtask subtask1 = new Subtask("Subtask 1", "Subtask 1 's description", epic);
-        subtask1.setId(2);
-        Subtask subtask2 = new Subtask("Subtask 2", "Subtask 2 's description", epic);
-        subtask2.setId(2);
+        Epic epic = Epic.createWithId(1, "Epic", "Description");
+        Subtask subtask1 = Subtask.createWithId(2,"Subtask 1", "Description 1", epic);
+        Subtask subtask2 = Subtask.createWithId(2, "Subtask 2", "Description 2", epic);
 
-        assertEquals(subtask1, subtask2, "Subtasks with same id should be same by id");
+        assertEquals(subtask1, subtask2, "Subtasks with same id should be equal");
     }
 
     @Test
     public void testSubtaskCannotBeItsOwnEpic() {
-        Subtask subtask = new Subtask("Subtask 1", "Description", null);
-        Epic epic = new Epic("Epic", "Epic's description");
+        Subtask subtask = Subtask.createWithId(1, "Subtask", "Description", null);
+        Epic epic = Epic.createWithId(2, "Epic", "Description");
 
         assertNotEquals(subtask, subtask.getEpic(), "Subtask should not be its own epic");
     }
+
+
 
 }
