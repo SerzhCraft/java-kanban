@@ -10,18 +10,23 @@ public class Task {
     private String description;
     private TaskStatus taskStatus;
 
-    public Task(String name, String description) {
+    protected Task(int id, String name, String description, TaskStatus status) {
+        this.id = id;
         this.name = name;
         this.description = description;
-        this.taskStatus = TaskStatus.NEW;
+        this.taskStatus = status;
+    }
+
+    public Task(String name, String description) {
+        this(0, name, description, TaskStatus.NEW);
+    }
+
+    public static Task createWithId(int id, String name, String description) {
+        return new Task(id, name, description, TaskStatus.NEW);
     }
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -49,8 +54,7 @@ public class Task {
     }
 
     public Task copy() {
-        Task copy = new Task(this.name, this.description);
-        copy.setId(this.id);
+        Task copy = Task.createWithId(this.id, this.name, this.description);
         copy.setTaskStatus(this.taskStatus);
         return copy;
     }

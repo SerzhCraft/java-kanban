@@ -1,11 +1,21 @@
 package main.java.models;
 
+import main.java.enums.TaskStatus;
+
 public class Subtask extends Task {
     private Epic epic;
 
-    public Subtask(String name, String description, Epic epic) {
-        super(name, description);
+    protected Subtask(int id, String name, String description, Epic epic) {
+        super(id, name, description, TaskStatus.NEW);
         setEpic(epic);
+    }
+
+    public Subtask(String name, String description, Epic epic) {
+        this(0, name, description, epic);
+    }
+
+    public static Subtask createWithId(int id, String name, String description, Epic epic) {
+        return new Subtask(id, name, description, epic);
     }
 
     public Epic getEpic() {
@@ -24,8 +34,7 @@ public class Subtask extends Task {
 
     @Override
     public Subtask copy() {
-        Subtask copy = new Subtask(this.getName(), this.getDescription(), this.epic);
-        copy.setId(this.getId());
+        Subtask copy = Subtask.createWithId(this.getId(), this.getName(), this.getDescription(), this.epic);
         copy.setTaskStatus(this.getTaskStatus());
         return copy;
     }

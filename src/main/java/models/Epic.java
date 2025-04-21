@@ -3,28 +3,40 @@ package main.java.models;
 import main.java.enums.TaskStatus;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Epic extends Task {
-    private ArrayList<Subtask> subtasks;
+    private final List<Subtask> subtasks;
 
-    public Epic(String name, String description) {
-        super(name, description);
+    protected Epic(int id, String name, String description) {
+        super(id, name, description, TaskStatus.NEW);
         this.subtasks = new ArrayList<>();
     }
 
-    public ArrayList<Subtask> getSubtasks() {
-        return subtasks;
+    public Epic(String name, String description) {
+        this(0, name, description);
+    }
+
+    public static Epic createWithId(int id, String name, String description) {
+        return new Epic(id, name, description);
+    }
+
+
+    public List<Subtask> getSubtasks() {
+        return new ArrayList<>(subtasks);
     }
 
     public void addSubtask(Subtask subtask) {
-        if (subtask == null || subtask.getEpic() == this) {
+        if (subtask == null || subtask.getEpic() != this) {
             return;
         }
         subtasks.add(subtask);
+        updateStatus();
     }
 
     public void removeSubtask(Subtask subtask) {
         subtasks.remove(subtask);
+        updateStatus();
     }
 
     public void updateStatus() {
@@ -35,6 +47,7 @@ public class Epic extends Task {
 
         boolean isAllDone = true;
         boolean isAllNew = true;
+
         for (Subtask subtask : subtasks) {
             if (subtask.getTaskStatus() == TaskStatus.IN_PROGRESS) {
                 setTaskStatus(TaskStatus.IN_PROGRESS);
@@ -58,8 +71,7 @@ public class Epic extends Task {
 
     @Override
     public Epic copy() {
-        Epic copy = new Epic(this.getName(), this.getDescription());
-        copy.setId(this.getId());
+        Epic copy = Epic.createWithId(this.getId(), this.getName(), this.getDescription());
         copy.setTaskStatus(this.getTaskStatus());
         return copy;
     }
