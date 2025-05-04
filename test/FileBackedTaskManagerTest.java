@@ -31,9 +31,9 @@ public class FileBackedTaskManagerTest {
 
     @Test
     public void testCreateAndLoadTasks() throws IOException {
-        Task task1 = Task.createWithId(1, "Задача 1", "Описание задачи 1");
-        Epic epic1 = Epic.createWithId(2, "Эпик 1", "Описание эпика 1");
-        Subtask subtask1 = Subtask.createWithId(3, "Подзадача 1", "Описание подзадачи 1", epic1);
+        Task task1 = Task.createWithId(1, "Task 1", "Description 1");
+        Epic epic1 = Epic.createWithId(2, "Epic 1", "Description 1");
+        Subtask subtask1 = Subtask.createWithId(3, "Subtask 1", "Description 1", epic1);
 
         manager.createTask(task1);
         manager.createEpic(epic1);
@@ -53,21 +53,21 @@ public class FileBackedTaskManagerTest {
 
     @Test
     public void testUpdateTask() throws IOException {
-        Task task = Task.createWithId(1, "Задача 1", "Описание задачи 1");
+        Task task = Task.createWithId(1, "Task 1", "Description 1");
         manager.createTask(task);
         manager.save();
 
-        task.setName("Обновленная Задача 1");
+        task.setName("Updated task 1");
         manager.updateTask(task);
 
         FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(path);
 
-        assertEquals("Обновленная Задача 1", loadedManager.getAllTasks().getFirst().getName());
+        assertEquals("Updated task 1", loadedManager.getAllTasks().getFirst().getName());
     }
 
     @Test
     public void testDeleteTaskById() throws IOException {
-        Task task = Task.createWithId(1, "Задача 1", "Описание задачи 1");
+        Task task = Task.createWithId(1, "Task 1", "Description 1");
         manager.createTask(task);
         manager.save();
 
