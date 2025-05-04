@@ -24,6 +24,4 @@ public class SubtaskTest {
         assertNotEquals(subtask, subtask.getEpic(), "Subtask should not be its own epic");
     }
 
-
-
 }

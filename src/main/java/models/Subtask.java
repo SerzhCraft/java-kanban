@@ -1,6 +1,7 @@
 package main.java.models;
 
 import main.java.enums.TaskStatus;
+import main.java.enums.TaskType;
 
 public class Subtask extends Task {
     private Epic epic;
@@ -22,6 +23,10 @@ public class Subtask extends Task {
         return epic;
     }
 
+    public int getEpicId() {
+        return (epic != null) ? epic.getId() : -1;
+    }
+
     public void setEpic(Epic epic) {
         if (epic == null) {
             return;
@@ -30,6 +35,11 @@ public class Subtask extends Task {
             return;
         }
         this.epic = epic;
+    }
+
+    @Override
+    public TaskType getType() {
+        return TaskType.SUBTASK;
     }
 
     @Override
@@ -42,7 +52,7 @@ public class Subtask extends Task {
     @Override
     public String toString() {
         return "Subtask{" + super.toString() +
-                "epic=" + epic.getName() +
+                "epic=" + (epic != null ? epic.getName() : "null") +
                 '}';
     }
 }
