@@ -8,7 +8,9 @@ import main.java.models.Task;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
     private final Path filePath;
@@ -37,6 +39,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
+    public void deleteAllTasks() {
+        super.deleteAllTasks();
+        save();
+    }
+
+    @Override
     public Subtask createSubtask(Subtask subtask) {
         Subtask createdSubtask = super.createSubtask(subtask);
         save();
@@ -56,6 +64,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
+    public void deleteAllSubtasks() {
+        super.deleteAllSubtasks();
+        save();
+    }
+
+    @Override
     public Epic createEpic(Epic epic) {
         Epic createdEpic = super.createEpic(epic);
         save();
@@ -71,6 +85,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     @Override
     public void deleteEpicById(int id) {
         super.deleteEpicById(id);
+        save();
+    }
+
+    @Override
+    public void deleteAllEpics() {
+        super.deleteAllEpics();
         save();
     }
 
@@ -97,15 +117,15 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     private String toString(Task task) {
-        return String.format("%d,TASK,%s,%s,%s,", task.getId(), task.getName(), task.getTaskStatus(), task.getDescription());
+        return String.format("%d,%s,%s,%s,%s,", task.getId(), task.getType(), task.getName(), task.getTaskStatus(), task.getDescription());
     }
 
     private String toString(Epic epic) {
-        return String.format("%d,EPIC,%s,%s,%s,", epic.getId(), epic.getName(), epic.getTaskStatus(), epic.getDescription());
+        return String.format("%d,%s,%s,%s,%s,", epic.getId(), epic.getType(), epic.getName(), epic.getTaskStatus(), epic.getDescription());
     }
 
     private String toString(Subtask subtask) {
-        return String.format("%d,SUBTASK,%s,%s,%s,%d", subtask.getId(), subtask.getName(), subtask.getTaskStatus(), subtask.getDescription(), subtask.getEpic().getId());
+        return String.format("%d,%s,%s,%s,%s,%d", subtask.getId(), subtask.getType(), subtask.getName(), subtask.getTaskStatus(), subtask.getDescription(), subtask.getEpic().getId());
     }
 
     public static FileBackedTaskManager loadFromFile(Path filePath) throws IOException {
@@ -119,21 +139,39 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         // Проверяем, есть ли строки после заголовка
         if (lines.size() > 1) { // Если есть хотя бы одна строка данных
+            // Сначала создаем мапу для хранения загруженных эпиков
+            Map<Integer, Epic> epicMap = new HashMap<>();
+
             for (String line : lines.subList(1, lines.size())) { // Пропускаем заголовок
-                Task task = fromString(line);
-                if (task instanceof Subtask) {
-                    manager.createSubtask((Subtask) task);
-                } else if (task instanceof Epic) {
-                    manager.createEpic((Epic) task);
-                } else {
-                    manager.createTask(task);
+                Task task = fromString(line, epicMap);
+                switch (task.getType()) {
+                    case TASK:
+                        manager.createTask(task); // Создаем обычную задачу
+                        break;
+                    case EPIC:
+                        Epic epic = (Epic) task; // Приводим к Epic
+                        epicMap.put(epic.getId(), epic);
+                        manager.createEpic(epic); // Создаем эпик в менеджере
+                        break;
+                    case SUBTASK:
+                        Subtask subtask = (Subtask) task; // Приводим к Subtask
+                        Epic associatedEpic = epicMap.get(subtask.getEpicId());
+                        if (associatedEpic != null) {
+                            subtask.setEpic(associatedEpic); // Устанавливаем связь с эпиком
+                            manager.createSubtask(subtask); // Создаем подзадачу в менеджере
+                        } else {
+                            throw new IllegalArgumentException("Epic not found for subtask: " + subtask);
+                        }
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Unknown type: " + task.getType());
                 }
             }
         }
         return manager;
     }
 
-    private static Task fromString(String value) {
+    private static Task fromString(String value, Map<Integer, Epic> epicMap) {
         String[] parts = value.split(",");
 
         if (parts.length < 5) {
@@ -160,8 +198,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     throw new IllegalArgumentException("Not enough data to create a subtask: " + value);
                 }
                 int epicId = Integer.parseInt(parts[5]);
-                Epic tempEpic = Epic.createWithId(epicId, "", "");
-                Subtask subtask = Subtask.createWithId(id, name, description, tempEpic);
+                Epic associatedEpic = epicMap.get(epicId); // Получаем связанный эпик из мапы
+                if (associatedEpic == null) {
+                    throw new IllegalArgumentException("Epic not found for subtask: " + value);
+                }
+                Subtask subtask = Subtask.createWithId(id, name, description, associatedEpic); // Используем существующий эпик
                 subtask.setTaskStatus(status);
                 return subtask;
             default:
