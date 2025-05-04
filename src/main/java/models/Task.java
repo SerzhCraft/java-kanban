@@ -1,6 +1,7 @@
 package main.java.models;
 
 import main.java.enums.TaskStatus;
+import main.java.enums.TaskType;
 
 import java.util.Objects;
 
@@ -59,7 +60,11 @@ public class Task {
         return copy;
     }
 
-   @Override
+    public TaskType getType() {
+        return TaskType.TASK;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

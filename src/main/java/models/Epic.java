@@ -1,6 +1,7 @@
 package main.java.models;
 
 import main.java.enums.TaskStatus;
+import main.java.enums.TaskType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,6 +68,11 @@ public class Epic extends Task {
         } else {
             setTaskStatus(TaskStatus.IN_PROGRESS);
         }
+    }
+
+    @Override
+    public TaskType getType() {
+        return TaskType.EPIC;
     }
 
     @Override
