@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -31,9 +33,17 @@ public class FileBackedTaskManagerTest {
 
     @Test
     public void testCreateAndLoadTasks() throws IOException {
+        Duration duration = Duration.ZERO;
+        LocalDateTime startTime = LocalDateTime.now();
+
         Task task1 = Task.createWithId(1, "Task 1", "Description 1");
-        Epic epic1 = Epic.createWithId(2, "Epic 1", "Description 1");
-        Subtask subtask1 = Subtask.createWithId(3, "Subtask 1", "Description 1", epic1);
+        Epic epic1 = Epic.createWithId(2, "Epic 1", "Description 1", duration, startTime);
+        Subtask subtask1 = Subtask.createWithId(3,
+                "Subtask 1",
+                "Description 1",
+                epic1,
+                duration,
+                startTime);
 
         manager.createTask(task1);
         manager.createEpic(epic1);

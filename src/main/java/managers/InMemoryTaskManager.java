@@ -4,6 +4,8 @@ import main.java.models.Epic;
 import main.java.models.Subtask;
 import main.java.models.Task;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -96,7 +98,14 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Epic createEpic(Epic epic) {
         int newId = generateId();
-        Epic newEpic = Epic.createWithId(newId, epic.getName(), epic.getDescription());
+        Duration duration = Duration.ZERO;
+        LocalDateTime startTime = LocalDateTime.now();
+
+        Epic newEpic = Epic.createWithId(newId,
+                epic.getName(),
+                epic.getDescription(),
+                duration,
+                startTime);
         epics.put(newId, newEpic);
         return newEpic;
     }
@@ -152,11 +161,16 @@ public class InMemoryTaskManager implements TaskManager {
         int epicId = subtask.getEpic().getId();
         Epic epic = epics.get(epicId);
 
+        Duration duration = Duration.ZERO;
+        LocalDateTime startTime = LocalDateTime.now();
+
         Subtask newSubtask = Subtask.createWithId(
                 newId,
                 subtask.getName(),
                 subtask.getDescription(),
-                epic);
+                epic,
+                duration,
+                startTime);
 
         newSubtask.setTaskStatus(subtask.getTaskStatus());
 

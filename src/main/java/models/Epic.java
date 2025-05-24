@@ -3,23 +3,29 @@ package main.java.models;
 import main.java.enums.TaskStatus;
 import main.java.enums.TaskType;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Epic extends Task {
     private final List<Subtask> subtasks;
 
-    protected Epic(int id, String name, String description) {
-        super(id, name, description, TaskStatus.NEW);
+    protected Epic(int id, String name, String description, Duration duration, LocalDateTime startTime) {
+        super(id, name, description, TaskStatus.NEW, duration, startTime);
         this.subtasks = new ArrayList<>();
     }
 
-    public Epic(String name, String description) {
-        this(0, name, description);
+    public Epic(String name, String description, Duration duration, LocalDateTime startTime) {
+        this(0, name, description, duration, startTime);
     }
 
-    public static Epic createWithId(int id, String name, String description) {
-        return new Epic(id, name, description);
+    public static Epic createWithId(int id,
+                                    String name,
+                                    String description,
+                                    Duration duration,
+                                    LocalDateTime startTime) {
+        return new Epic(id, name, description, duration, startTime);
     }
 
 
@@ -68,6 +74,37 @@ public class Epic extends Task {
         } else {
             setTaskStatus(TaskStatus.IN_PROGRESS);
         }
+        updateDurationAndStartEndTimes();
+    }
+
+    private void updateDurationAndStartEndTimes() {
+        if (subtasks.isEmpty()) {
+            setDuration(Duration.ZERO);
+            setStartTime(null);
+            return;
+        }
+
+        Duration totalDuration = Duration.ZERO;
+        LocalDateTime earliestStart = null;
+        LocalDateTime latestEnd = null;
+
+        for (Subtask subtask : subtasks) {
+            totalDuration = totalDuration.plus(subtask.getDuration());
+            if (earliestStart == null || subtask.getStartTime().isBefore(earliestStart)) {
+                earliestStart = subtask.getStartTime();
+            }
+            if (latestEnd == null || subtask.getEndTime().isAfter(latestEnd)) {
+                latestEnd = subtask.getEndTime();
+            }
+        }
+
+        setDuration(totalDuration);
+        setStartTime(earliestStart);
+    }
+
+    @Override
+    public LocalDateTime getEndTime() {
+        return getStartTime().plus(getDuration());
     }
 
     @Override
@@ -77,7 +114,11 @@ public class Epic extends Task {
 
     @Override
     public Epic copy() {
-        Epic copy = Epic.createWithId(this.getId(), this.getName(), this.getDescription());
+        Epic copy = Epic.createWithId(this.getId(),
+                this.getName(),
+                this.getDescription(),
+                this.getDuration(),
+                this.getStartTime());
         copy.setTaskStatus(this.getTaskStatus());
         return copy;
     }

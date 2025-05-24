@@ -6,6 +6,9 @@ import main.java.models.Epic;
 import main.java.models.Subtask;
 import main.java.models.Task;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class Main {
 
     public static void main(String[] args) {
@@ -14,13 +17,16 @@ public class Main {
 
         System.out.println("=== 1. Create tasks and epics ===");
 
+        Duration duration = Duration.ofMinutes(30);
+        LocalDateTime startTime = LocalDateTime.now();
+
         Task task1 = new Task("Task 1", "Description 1");
         task1 = taskManager.createTask(task1);
 
         Task task2 = new Task("Task 2", "Description 2");
         task2 = taskManager.createTask(task2);
 
-        Epic epicWithSubtasks = new Epic("Epic with subtasks", "Description");
+        Epic epicWithSubtasks = new Epic("Epic with subtasks", "Description", duration, startTime);
         epicWithSubtasks = taskManager.createEpic(epicWithSubtasks);
 
         Subtask subtask1 = new Subtask("Subtask 1", "Description 1", epicWithSubtasks);
@@ -32,7 +38,7 @@ public class Main {
         Subtask subtask3 = new Subtask("Subtask 3", "Description 3", epicWithSubtasks);
         subtask3 = taskManager.createSubtask(subtask3);
 
-        Epic epicWithoutSubtasks = new Epic("Epic without subtasks", "Description");
+        Epic epicWithoutSubtasks = new Epic("Epic without subtasks", "Description", duration, startTime);
         epicWithoutSubtasks = taskManager.createEpic(epicWithoutSubtasks);
 
         printAllTasks(taskManager);
@@ -112,5 +118,4 @@ public class Main {
         }
         System.out.println();
     }
-
 }

@@ -3,6 +3,8 @@ package main.java.models;
 import main.java.enums.TaskStatus;
 import main.java.enums.TaskType;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Task {
@@ -10,20 +12,29 @@ public class Task {
     private String name;
     private String description;
     private TaskStatus taskStatus;
+    private Duration duration;
+    private LocalDateTime startTime;
 
-    protected Task(int id, String name, String description, TaskStatus status) {
+    protected Task(int id,
+                   String name,
+                   String description,
+                   TaskStatus status,
+                   Duration duration,
+                   LocalDateTime startTime) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.taskStatus = status;
+        this.duration = duration;
+        this.startTime = startTime;
     }
 
     public Task(String name, String description) {
-        this(0, name, description, TaskStatus.NEW);
+        this(0, name, description, TaskStatus.NEW, Duration.ZERO, LocalDateTime.now());
     }
 
     public static Task createWithId(int id, String name, String description) {
-        return new Task(id, name, description, TaskStatus.NEW);
+        return new Task(id, name, description, TaskStatus.NEW, Duration.ZERO, LocalDateTime.now());
     }
 
     public int getId() {
@@ -54,6 +65,26 @@ public class Task {
         this.taskStatus = taskStatus;
     }
 
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return startTime.plus(duration);
+    }
+
     public Task copy() {
         Task copy = Task.createWithId(this.id, this.name, this.description);
         copy.setTaskStatus(this.taskStatus);
@@ -74,7 +105,7 @@ public class Task {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Integer.hashCode(id);
     }
 
     @Override
@@ -84,6 +115,8 @@ public class Task {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", taskStatus=" + taskStatus +
+                ", duration=" + duration.toMinutes() + " minutes" +
+                ", startTime=" + startTime +
                 '}';
     }
 }

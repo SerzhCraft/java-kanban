@@ -7,6 +7,9 @@ import main.java.models.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class TaskManagerTest {
@@ -27,7 +30,10 @@ class TaskManagerTest {
 
     @Test
     void shouldRemoveSubtasksWhenEpicDeleted() {
-        Epic epic = taskManager.createEpic(new Epic("Epic", "Description"));
+        Duration duration = Duration.ZERO;
+        LocalDateTime startTime = LocalDateTime.now();
+
+        Epic epic = taskManager.createEpic(new Epic("Epic", "Description", duration, startTime));
         Subtask subtask = taskManager.createSubtask(new Subtask("Subtask", "Description", epic));
 
         assertEquals(1, taskManager.getAllSubtasks().size());
@@ -37,7 +43,10 @@ class TaskManagerTest {
 
     @Test
     void shouldUpdateEpicStatusWhenSubtaskChanged() {
-        Epic epic = taskManager.createEpic(new Epic("Epic", "Description"));
+        Duration duration = Duration.ZERO;
+        LocalDateTime startTime = LocalDateTime.now();
+
+        Epic epic = taskManager.createEpic(new Epic("Epic", "Description", duration, startTime));
         Subtask subtask = taskManager.createSubtask(new Subtask("Subtask", "Description", epic));
 
         assertEquals(TaskStatus.NEW, epic.getTaskStatus());
@@ -49,9 +58,12 @@ class TaskManagerTest {
 
     @Test
     void taskManagerShouldAddAndFindTasksById() {
+        Duration duration = Duration.ZERO;
+        LocalDateTime startTime = LocalDateTime.now();
+
         Task task = new Task("Task", "Description");
         task = taskManager.createTask(task);
-        Epic epic = new Epic("Epic", "Description");
+        Epic epic = new Epic("Epic", "Description", duration, startTime);
         epic = taskManager.createEpic(epic);
         Subtask subtask = new Subtask("Subtask 1", "Description", epic);
         subtask = taskManager.createSubtask(subtask);
@@ -98,7 +110,10 @@ class TaskManagerTest {
 
     @Test
     void epicShouldNotContainDeletedSubtask() {
-        Epic epic = new Epic("Epic", "Description");
+        Duration duration = Duration.ZERO;
+        LocalDateTime startTime = LocalDateTime.now();
+
+        Epic epic = new Epic("Epic", "Description", duration, startTime);
         epic = taskManager.createEpic(epic);
         Subtask subtask = new Subtask("Subtask", "Description", epic);
         subtask = taskManager.createSubtask(subtask);
