@@ -91,31 +91,25 @@ public class Main {
 
     private static void printHistory(TaskManager manager) {
         System.out.println("Current history (" + manager.getHistory().size() + " elements):");
-        for (Task task : manager.getHistory()) {
-            System.out.println("- " + task);
-        }
+        manager.getHistory().forEach(task -> System.out.println("- " + task));
         System.out.println();
     }
 
     private static void printAllTasks(TaskManager manager) {
         System.out.println("\nAll tasks in system:");
         System.out.println("Tasks:");
-        for (Task task : manager.getAllTasks()) {
-            System.out.println("  " + task);
-        }
+        manager.getAllTasks().forEach(task -> System.out.println(" " + task));
 
         System.out.println("Epics:");
-        for (Epic epic : manager.getAllEpics()) {
+        manager.getAllEpics().forEach(epic -> {
             System.out.println("  " + epic);
-            for (Subtask subtask : manager.getSubtaskByEpicId(epic.getId())) {
-                System.out.println("    -> " + subtask);
-            }
-        }
+            manager.getSubtaskByEpicId(epic.getId()).forEach(subtask ->
+                    System.out.println("    -> " + subtask));
+        });
 
         System.out.println("Subtasks:");
-        for (Subtask subtask : manager.getAllSubtasks()) {
-            System.out.println("  " + subtask);
-        }
+        manager.getAllSubtasks().forEach(subtask ->
+                System.out.println("  " + subtask));
         System.out.println();
     }
 }
