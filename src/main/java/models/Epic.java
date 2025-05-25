@@ -3,23 +3,30 @@ package main.java.models;
 import main.java.enums.TaskStatus;
 import main.java.enums.TaskType;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Epic extends Task {
     private final List<Subtask> subtasks;
 
-    protected Epic(int id, String name, String description) {
-        super(id, name, description, TaskStatus.NEW);
+    protected Epic(int id, String name, String description, Duration duration, LocalDateTime startTime) {
+        super(id, name, description, TaskStatus.NEW, duration, startTime);
         this.subtasks = new ArrayList<>();
     }
 
-    public Epic(String name, String description) {
-        this(0, name, description);
+    public Epic(String name, String description, Duration duration, LocalDateTime startTime) {
+        this(0, name, description, duration, startTime);
     }
 
-    public static Epic createWithId(int id, String name, String description) {
-        return new Epic(id, name, description);
+    public static Epic createWithId(int id,
+                                    String name,
+                                    String description,
+                                    Duration duration,
+                                    LocalDateTime startTime) {
+        return new Epic(id, name, description, duration, startTime);
     }
 
 
@@ -46,20 +53,15 @@ public class Epic extends Task {
             return;
         }
 
-        boolean isAllDone = true;
-        boolean isAllNew = true;
+        boolean isAllDone = subtasks.stream()
+                .allMatch(subtask -> subtask.getTaskStatus() == TaskStatus.DONE);
+        boolean isAllNew = subtasks.stream()
+                .allMatch(subtask -> subtask.getTaskStatus() == TaskStatus.NEW);
 
-        for (Subtask subtask : subtasks) {
-            if (subtask.getTaskStatus() == TaskStatus.IN_PROGRESS) {
-                setTaskStatus(TaskStatus.IN_PROGRESS);
-                return;
-            }
-            if (subtask.getTaskStatus() != TaskStatus.DONE) {
-                isAllDone = false;
-            }
-            if (subtask.getTaskStatus() != TaskStatus.NEW) {
-                isAllNew = false;
-            }
+        if (subtasks.stream()
+                .anyMatch(subtask -> subtask.getTaskStatus() == TaskStatus.IN_PROGRESS)) {
+            setTaskStatus(TaskStatus.IN_PROGRESS);
+            return;
         }
         if (isAllNew) {
             setTaskStatus(TaskStatus.NEW);
@@ -68,6 +70,39 @@ public class Epic extends Task {
         } else {
             setTaskStatus(TaskStatus.IN_PROGRESS);
         }
+        updateDurationAndStartEndTimes();
+    }
+
+    private void updateDurationAndStartEndTimes() {
+        if (subtasks.isEmpty()) {
+            setDuration(Duration.ZERO);
+            setStartTime(null);
+            return;
+        }
+
+        Duration totalDuration = subtasks.stream()
+                .map(Subtask::getDuration)
+                .reduce(Duration.ZERO, Duration::plus);
+
+        LocalDateTime earliestStart = subtasks.stream()
+                .map(Subtask::getStartTime)
+                .filter(Objects::nonNull)
+                .min(LocalDateTime::compareTo)
+                .orElse(null);
+
+        LocalDateTime latestEnd = subtasks.stream()
+                .map(Subtask::getEndTime)
+                .filter(Objects::nonNull)
+                .max(LocalDateTime::compareTo)
+                .orElse(null);
+
+        setDuration(totalDuration);
+        setStartTime(earliestStart);
+    }
+
+    @Override
+    public LocalDateTime getEndTime() {
+        return getStartTime().plus(getDuration());
     }
 
     @Override
@@ -77,10 +112,12 @@ public class Epic extends Task {
 
     @Override
     public Epic copy() {
-        Epic copy = Epic.createWithId(this.getId(), this.getName(), this.getDescription());
+        Epic copy = Epic.createWithId(this.getId(),
+                this.getName(),
+                this.getDescription(),
+                this.getDuration(),
+                this.getStartTime());
         copy.setTaskStatus(this.getTaskStatus());
         return copy;
     }
 }
-
-

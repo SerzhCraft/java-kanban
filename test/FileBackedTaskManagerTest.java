@@ -9,10 +9,12 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class FileBackedTaskManagerTest {
+public class FileBackedTaskManagerTest extends AbstractTaskManagerTest<FileBackedTaskManager> {
     private FileBackedTaskManager manager;
     private Path path;
 
@@ -21,7 +23,7 @@ public class FileBackedTaskManagerTest {
         path = Path.of("test_tasks.csv");
         // Создаем пустой файл перед каждым тестом
         Files.createFile(path);
-        manager = new FileBackedTaskManager(path);
+        taskManager = new FileBackedTaskManager(path);
     }
 
     @AfterEach
@@ -31,14 +33,22 @@ public class FileBackedTaskManagerTest {
 
     @Test
     public void testCreateAndLoadTasks() throws IOException {
-        Task task1 = Task.createWithId(1, "Task 1", "Description 1");
-        Epic epic1 = Epic.createWithId(2, "Epic 1", "Description 1");
-        Subtask subtask1 = Subtask.createWithId(3, "Subtask 1", "Description 1", epic1);
+        Duration duration = Duration.ZERO;
+        LocalDateTime startTime = LocalDateTime.now();
 
-        manager.createTask(task1);
-        manager.createEpic(epic1);
-        manager.createSubtask(subtask1);
-        manager.save();
+        Task task1 = Task.createWithId(1, "Task 1", "Description 1");
+        Epic epic1 = Epic.createWithId(2, "Epic 1", "Description 1", duration, startTime);
+        Subtask subtask1 = Subtask.createWithId(3,
+                "Subtask 1",
+                "Description 1",
+                epic1,
+                duration,
+                startTime);
+
+        taskManager.createTask(task1);
+        taskManager.createEpic(epic1);
+        taskManager.createSubtask(subtask1);
+        taskManager.save();
 
         FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(path);
 
@@ -54,11 +64,11 @@ public class FileBackedTaskManagerTest {
     @Test
     public void testUpdateTask() throws IOException {
         Task task = Task.createWithId(1, "Task 1", "Description 1");
-        manager.createTask(task);
-        manager.save();
+        taskManager.createTask(task);
+        taskManager.save();
 
         task.setName("Updated task 1");
-        manager.updateTask(task);
+        taskManager.updateTask(task);
 
         FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(path);
 
@@ -68,10 +78,10 @@ public class FileBackedTaskManagerTest {
     @Test
     public void testDeleteTaskById() throws IOException {
         Task task = Task.createWithId(1, "Task 1", "Description 1");
-        manager.createTask(task);
-        manager.save();
+        taskManager.createTask(task);
+        taskManager.save();
 
-        manager.deleteTaskById(task.getId());
+        taskManager.deleteTaskById(task.getId());
 
         FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(path);
 

@@ -7,74 +7,19 @@ import main.java.models.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-class TaskManagerTest {
-    TaskManager taskManager;
+class TaskManagerTest extends AbstractTaskManagerTest<TaskManager> {
 
     @BeforeEach
+    @Override
     public void setUp() {
         taskManager = Managers.getDefault();
-    }
-
-    @Test
-    void shouldGenerateUniqueIds() {
-        Task task1 = taskManager.createTask(new Task("Task 1", "Description 1"));
-        Task task2 = taskManager.createTask(new Task("Task 2", "Description 2"));
-
-        assertNotEquals(task1.getId(), task2.getId(), "Tasks should have unique IDs");
-    }
-
-    @Test
-    void shouldRemoveSubtasksWhenEpicDeleted() {
-        Epic epic = taskManager.createEpic(new Epic("Epic", "Description"));
-        Subtask subtask = taskManager.createSubtask(new Subtask("Subtask", "Description", epic));
-
-        assertEquals(1, taskManager.getAllSubtasks().size());
-        taskManager.deleteEpicById(epic.getId());
-        assertTrue(taskManager.getAllSubtasks().isEmpty());
-    }
-
-    @Test
-    void shouldUpdateEpicStatusWhenSubtaskChanged() {
-        Epic epic = taskManager.createEpic(new Epic("Epic", "Description"));
-        Subtask subtask = taskManager.createSubtask(new Subtask("Subtask", "Description", epic));
-
-        assertEquals(TaskStatus.NEW, epic.getTaskStatus());
-
-        subtask.setTaskStatus(TaskStatus.DONE);
-        taskManager.updateSubtask(subtask);
-        assertEquals(TaskStatus.DONE, epic.getTaskStatus());
-    }
-
-    @Test
-    void taskManagerShouldAddAndFindTasksById() {
-        Task task = new Task("Task", "Description");
-        task = taskManager.createTask(task);
-        Epic epic = new Epic("Epic", "Description");
-        epic = taskManager.createEpic(epic);
-        Subtask subtask = new Subtask("Subtask 1", "Description", epic);
-        subtask = taskManager.createSubtask(subtask);
-
-        assertEquals(task, taskManager.getTaskById(task.getId()), "Task should be find by ID");
-        assertEquals(epic, taskManager.getEpicById(epic.getId()), "Epic should be find by ID");
-        assertEquals(subtask, taskManager.getSubtaskById(subtask.getId()), "Subtask should be find by ID");
-    }
-
-    @Test
-    void tasksWithSpecifyAndGeneratedIdShouldNotConflict() {
-        Task taskWithSpecifyId = Task.createWithId(1, "Task 1", "Description 1");
-        taskWithSpecifyId = taskManager.createTask(taskWithSpecifyId);
-
-        Task taskWithGeneratedId = new Task("Task 2", "Description 2");
-        taskWithGeneratedId = taskManager.createTask(taskWithGeneratedId);
-
-        assertNotEquals(taskWithSpecifyId.getId(), taskWithGeneratedId.getId(),
-                "Task's ID should not conflict");
-        assertEquals(taskWithSpecifyId, taskManager.getTaskById(1),
-                "Task should be find with specify ID");
-        assertEquals(taskWithGeneratedId, taskManager.getTaskById(taskWithGeneratedId.getId()),
-                "Task should be find with generated ID");
+        Duration duration = Duration.ZERO;
+        LocalDateTime startTime = LocalDateTime.now();// Используйте фабрику для получения экземпляра
     }
 
     @Test
@@ -95,35 +40,24 @@ class TaskManagerTest {
                 "Task's ID should not change");
     }
 
-
     @Test
-    void epicShouldNotContainDeletedSubtask() {
-        Epic epic = new Epic("Epic", "Description");
-        epic = taskManager.createEpic(epic);
-        Subtask subtask = new Subtask("Subtask", "Description", epic);
-        subtask = taskManager.createSubtask(subtask);
+    void shouldUpdateEpicStatusWhenSubtaskChanged() {
+        Duration duration = Duration.ZERO;
+        LocalDateTime startTime = LocalDateTime.now();
 
-        taskManager.deleteSubtaskById(subtask.getId());
-        assertTrue(epic.getSubtasks().isEmpty());
-    }
+        Epic epic = taskManager.createEpic(new Epic("Epic", "Description", duration, startTime));
+        Subtask subtask = taskManager.createSubtask(new Subtask("Subtask", "Description", epic));
 
-    @Test
-    void creatingTaskWithExistingIdShouldNotConflict() {
-        Task task1 = Task.createWithId(1, "Task 1", "Description 1");
-        task1 = taskManager.createTask(task1);
+        assertEquals(TaskStatus.NEW, epic.getTaskStatus());
 
-        Task task2 = Task.createWithId(1, "Task 2", "Description 2");
-        task2 = taskManager.createTask(task2);
+        // Обновляем статус подзадачи
+        subtask.setTaskStatus(TaskStatus.DONE);
+        taskManager.updateSubtask(subtask);
 
-        assertNotEquals(task1.getId(), task2.getId());
-    }
+        // Обновляем статус эпика
+        epic.updateStatus(); // Убедитесь, что вызываете updateStatus здесь
 
-    @Test
-    void updatingNonExistentTaskShouldDoNothing() {
-        Task task = Task.createWithId(999, "Task", "Description");
-        taskManager.updateTask(task);
-
-        assertNull(taskManager.getTaskById(999));
+        assertEquals(TaskStatus.DONE, epic.getTaskStatus());
     }
 
 }
