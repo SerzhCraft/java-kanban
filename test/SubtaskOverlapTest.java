@@ -64,7 +64,7 @@ public class SubtaskOverlapTest {
         subtask1.setDuration(Duration.ofHours(4)); // Task A: (10:00 -14:00)
 
         Subtask subtask2 = new Subtask("Task B", "Description B", null);
-        subtask2.setStartTime(LocalDateTime.of(2025, 5, 24, 11,0)); // Task B полностью внутри Task A
+        subtask2.setStartTime(LocalDateTime.of(2025, 5, 24, 11, 0)); // Task B полностью внутри Task A
         subtask2.setDuration(Duration.ofHours(1)); // Task B: (11:00 -12:00)
 
         assertTrue(isTimeOverlap(subtask1, subtask2), "Tasks should overlap (B inside A)");
@@ -73,14 +73,14 @@ public class SubtaskOverlapTest {
     @Test
     void testCompletelyOutside() {
         Subtask subtask1 = new Subtask("Task A", "Description A", null);
-        subtask1.setStartTime(LocalDateTime.of(2025,5 ,24 ,10 ,0));
+        subtask1.setStartTime(LocalDateTime.of(2025, 5, 24, 10, 0));
         subtask1.setDuration(Duration.ofHours(4)); // Task A: (10:00 -14:00)
 
         Subtask subtask2 = new Subtask("Task B", "Description B", null);
-        subtask2.setStartTime(LocalDateTime.of(2025 ,5 ,24 ,15 ,0)); // Task B полностью вне Task A
+        subtask2.setStartTime(LocalDateTime.of(2025, 5, 24, 15, 0)); // Task B полностью вне Task A
         subtask2.setDuration(Duration.ofHours(1)); // Task B: (15:00 -16:00)
 
-        assertFalse(isTimeOverlap(subtask1 ,subtask2), "Tasks should not overlap (completely outside)");
+        assertFalse(isTimeOverlap(subtask1, subtask2), "Tasks should not overlap (completely outside)");
     }
 
 }

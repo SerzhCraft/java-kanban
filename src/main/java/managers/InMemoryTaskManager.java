@@ -260,14 +260,14 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Вспомогательный метод для добавления задачи в приоритетный список
     private void addToPrioritized(Task task) {
-        if (task != null && task.getStartTime() != null ) {
+        if (task != null && task.getStartTime() != null) {
             prioritizedTasks.add(task);
         }
     }
 
     // Вспомогательный метод для удаления задачи из приоритетного списка
     private void removeFromPrioritized(Task task) {
-        if (task != null && task.getStartTime() != null ) {
+        if (task != null && task.getStartTime() != null) {
             prioritizedTasks.remove(task);
         }
     }
@@ -286,7 +286,7 @@ public class InMemoryTaskManager implements TaskManager {
         LocalDateTime start2 = task2.getStartTime();
         LocalDateTime end2 = task2.getEndTime();
 
-        if (end1 == null || end2 == null || start1 == null || start2 == null ) {
+        if (end1 == null || end2 == null || start1 == null || start2 == null) {
             return false;
         }
 
@@ -296,7 +296,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Метод проверки пересечения задачи с любой другой
     public boolean hasOverlap(Task task) {
-        if (task == null || task.getStartTime() == null ) {
+        if (task == null || task.getStartTime() == null) {
             return false;
         }
 
