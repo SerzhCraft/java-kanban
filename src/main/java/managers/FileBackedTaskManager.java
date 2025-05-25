@@ -100,16 +100,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         StringBuilder sb = new StringBuilder();
         sb.append("id,type,name,status,description,duration,startTime,epic\n");
 
-        for (Task task : getAllTasks()) {
-            sb.append(toString(task)).append("\n");
-        }
+        getAllTasks().forEach(task -> sb.append(toString(task)).append("\n"));
 
-        for (Epic epic : getAllEpics()) {
+        getAllEpics().forEach(epic -> {
             sb.append(toString(epic)).append("\n");
-            for (Subtask subtask : getSubtaskByEpicId(epic.getId())) {
-                sb.append(toString(subtask)).append("\n");
-            }
-        }
+            getSubtaskByEpicId(epic.getId()).forEach(subtask ->
+                    sb.append(toString(subtask)).append("\n")
+            );
+        });
 
         try {
             Files.writeString(filePath, sb.toString());
@@ -166,31 +164,32 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             // Сначала создаем мапу для хранения загруженных эпиков
             Map<Integer, Epic> epicMap = new HashMap<>();
 
-            for (String line : lines.subList(1, lines.size())) { // Пропускаем заголовок
-                Task task = fromString(line, epicMap);
-                switch (task.getType()) {
-                    case TASK:
-                        manager.createTask(task); // Создаем обычную задачу
-                        break;
-                    case EPIC:
-                        Epic epic = (Epic) task; // Приводим к Epic
-                        epicMap.put(epic.getId(), epic);
-                        manager.createEpic(epic); // Создаем эпик в менеджере
-                        break;
-                    case SUBTASK:
-                        Subtask subtask = (Subtask) task; // Приводим к Subtask
-                        Epic associatedEpic = epicMap.get(subtask.getEpicId());
-                        if (associatedEpic != null) {
-                            subtask.setEpic(associatedEpic); // Устанавливаем связь с эпиком
-                            manager.createSubtask(subtask); // Создаем подзадачу в менеджере
-                        } else {
-                            throw new IllegalArgumentException("Epic not found for subtask: " + subtask);
+            lines.subList(1, lines.size()).stream()
+                    .map(line -> fromString(line, epicMap))
+                    .forEach(task -> {
+                        switch (task.getType()) {
+                            case TASK:
+                                manager.createTask(task); // Создаем обычную задачу
+                                break;
+                            case EPIC:
+                                Epic epic = (Epic) task; // Приводим к Epic
+                                epicMap.put(epic.getId(), epic);
+                                manager.createEpic(epic); // Создаем эпик в менеджере
+                                break;
+                            case SUBTASK:
+                                Subtask subtask = (Subtask) task; // Приводим к Subtask
+                                Epic associatedEpic = epicMap.get(subtask.getEpicId());
+                                if (associatedEpic != null) {
+                                    subtask.setEpic(associatedEpic); // Устанавливаем связь с эпиком
+                                    manager.createSubtask(subtask); // Создаем подзадачу в менеджере
+                                } else {
+                                    throw new IllegalArgumentException("Epic not found for subtask: " + subtask);
+                                }
+                                break;
+                            default:
+                                throw new IllegalArgumentException("Unknown type: " + task.getType());
                         }
-                        break;
-                    default:
-                        throw new IllegalArgumentException("Unknown type: " + task.getType());
-                }
-            }
+                    });
         }
         return manager;
     }

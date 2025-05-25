@@ -213,7 +213,9 @@ public class InMemoryTaskManager implements TaskManager {
             addToPrioritized(subtask);
 
             Epic epic = subtask.getEpic();
-            updateEpicStatus(epic);
+            if (epic != null) {
+                updateEpicStatus(epic);
+            }
         }
     }
 

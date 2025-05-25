@@ -7,6 +7,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Epic extends Task {
     private final List<Subtask> subtasks;
@@ -52,20 +53,15 @@ public class Epic extends Task {
             return;
         }
 
-        boolean isAllDone = true;
-        boolean isAllNew = true;
+        boolean isAllDone = subtasks.stream()
+                .allMatch(subtask -> subtask.getTaskStatus() == TaskStatus.DONE);
+        boolean isAllNew = subtasks.stream()
+                .allMatch(subtask -> subtask.getTaskStatus() == TaskStatus.NEW);
 
-        for (Subtask subtask : subtasks) {
-            if (subtask.getTaskStatus() == TaskStatus.IN_PROGRESS) {
-                setTaskStatus(TaskStatus.IN_PROGRESS);
-                return;
-            }
-            if (subtask.getTaskStatus() != TaskStatus.DONE) {
-                isAllDone = false;
-            }
-            if (subtask.getTaskStatus() != TaskStatus.NEW) {
-                isAllNew = false;
-            }
+        if (subtasks.stream().
+                anyMatch(subtask -> subtask.getTaskStatus() == TaskStatus.IN_PROGRESS)) {
+            setTaskStatus(TaskStatus.IN_PROGRESS);
+            return;
         }
         if (isAllNew) {
             setTaskStatus(TaskStatus.NEW);
@@ -84,19 +80,21 @@ public class Epic extends Task {
             return;
         }
 
-        Duration totalDuration = Duration.ZERO;
-        LocalDateTime earliestStart = null;
-        LocalDateTime latestEnd = null;
+        Duration totalDuration = subtasks.stream()
+                .map(Subtask::getDuration)
+                .reduce(Duration.ZERO, Duration::plus);
 
-        for (Subtask subtask : subtasks) {
-            totalDuration = totalDuration.plus(subtask.getDuration());
-            if (earliestStart == null || subtask.getStartTime().isBefore(earliestStart)) {
-                earliestStart = subtask.getStartTime();
-            }
-            if (latestEnd == null || subtask.getEndTime().isAfter(latestEnd)) {
-                latestEnd = subtask.getEndTime();
-            }
-        }
+        LocalDateTime earliestStart = subtasks.stream()
+                .map(Subtask::getStartTime)
+                .filter(Objects::nonNull)
+                .min(LocalDateTime::compareTo)
+                .orElse(null);
+
+        LocalDateTime latestEnd = subtasks.stream()
+                .map(Subtask::getEndTime)
+                .filter(Objects::nonNull)
+                .max(LocalDateTime::compareTo)
+                .orElse(null);
 
         setDuration(totalDuration);
         setStartTime(earliestStart);
