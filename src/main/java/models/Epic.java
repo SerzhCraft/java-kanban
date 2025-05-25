@@ -58,8 +58,8 @@ public class Epic extends Task {
         boolean isAllNew = subtasks.stream()
                 .allMatch(subtask -> subtask.getTaskStatus() == TaskStatus.NEW);
 
-        if (subtasks.stream().
-                anyMatch(subtask -> subtask.getTaskStatus() == TaskStatus.IN_PROGRESS)) {
+        if (subtasks.stream()
+                .anyMatch(subtask -> subtask.getTaskStatus() == TaskStatus.IN_PROGRESS)) {
             setTaskStatus(TaskStatus.IN_PROGRESS);
             return;
         }
