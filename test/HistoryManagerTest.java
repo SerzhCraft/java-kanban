@@ -5,10 +5,11 @@ import main.java.models.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class HistoryManagerTest {
     TaskManager taskManager;
@@ -18,6 +19,23 @@ public class HistoryManagerTest {
     public void setUp() {
         taskManager = Managers.getDefault();
         historyManager = Managers.getDefaultHistory();
+    }
+
+    @Test
+    void shouldReturnEmptyHistoryWhenNoTasksAdded() {
+        assertTrue(historyManager.getHistory().isEmpty(), "History should be empty");
+    }
+
+    @Test
+    void shouldNotAllowDuplicateTasksInHistory() {
+        Task task1 = new Task("Task 1", "Description 1");
+        Task task2 = new Task("Task 2", "Description 2");
+
+        historyManager.add(task1);
+        historyManager.add(task1); // Добавляем дубликат
+
+        assertEquals(1, historyManager.getHistory().size(), "History should contain only one instance of the task");
+        assertTrue(historyManager.getHistory().contains(task1), "History should contain the original task");
     }
 
     @Test

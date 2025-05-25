@@ -14,8 +14,12 @@ public class Subtask extends Task {
         setEpic(epic);
     }
 
+    public static Subtask create(int id, String name, String description, Epic epic, Duration duration, LocalDateTime startTime) {
+        return new Subtask(id, name, description, epic, duration, startTime);
+    }
+
     public Subtask(String name, String description, Epic epic) {
-        this(0, name, description, epic, Duration.ZERO, LocalDateTime.now());
+        this(1, name, description, epic, Duration.ZERO, LocalDateTime.now());
     }
 
     public static Subtask createWithId(int id,

@@ -70,6 +70,9 @@ public class Task {
     }
 
     public void setDuration(Duration duration) {
+        if (duration.isNegative()) {
+            throw new IllegalArgumentException("Duration cannot be negative");
+        }
         this.duration = duration;
     }
 

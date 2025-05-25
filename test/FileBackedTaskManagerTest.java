@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class FileBackedTaskManagerTest {
+public class FileBackedTaskManagerTest extends AbstractTaskManagerTest<FileBackedTaskManager> {
     private FileBackedTaskManager manager;
     private Path path;
 
@@ -23,7 +23,7 @@ public class FileBackedTaskManagerTest {
         path = Path.of("test_tasks.csv");
         // Создаем пустой файл перед каждым тестом
         Files.createFile(path);
-        manager = new FileBackedTaskManager(path);
+        taskManager = new FileBackedTaskManager(path);
     }
 
     @AfterEach
@@ -45,10 +45,10 @@ public class FileBackedTaskManagerTest {
                 duration,
                 startTime);
 
-        manager.createTask(task1);
-        manager.createEpic(epic1);
-        manager.createSubtask(subtask1);
-        manager.save();
+        taskManager.createTask(task1);
+        taskManager.createEpic(epic1);
+        taskManager.createSubtask(subtask1);
+        taskManager.save();
 
         FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(path);
 
@@ -64,11 +64,11 @@ public class FileBackedTaskManagerTest {
     @Test
     public void testUpdateTask() throws IOException {
         Task task = Task.createWithId(1, "Task 1", "Description 1");
-        manager.createTask(task);
-        manager.save();
+        taskManager.createTask(task);
+        taskManager.save();
 
         task.setName("Updated task 1");
-        manager.updateTask(task);
+        taskManager.updateTask(task);
 
         FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(path);
 
@@ -78,10 +78,10 @@ public class FileBackedTaskManagerTest {
     @Test
     public void testDeleteTaskById() throws IOException {
         Task task = Task.createWithId(1, "Task 1", "Description 1");
-        manager.createTask(task);
-        manager.save();
+        taskManager.createTask(task);
+        taskManager.save();
 
-        manager.deleteTaskById(task.getId());
+        taskManager.deleteTaskById(task.getId());
 
         FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(path);
 
